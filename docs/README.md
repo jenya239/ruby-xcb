@@ -1,150 +1,104 @@
-# Ruby XCB Bindings - Подробная документация
+# Ruby XCB - FFI bindings для libxcb
 
-Полные Ruby FFI привязки к библиотеке libxcb для работы с X Window System.
+Ruby FFI привязки к библиотеке `libxcb.so` для работы с X Window System.
 
-## Установка
-
-```bash
-bundle install
-```
-
-## Использование
+## Быстрый старт
 
 ```ruby
 require_relative 'lib/xcb'
 
 # Подключение к X серверу
-screen_ptr = FFI::MemoryPointer.new(:int)
-conn = XCB.xcb_connect(nil, screen_ptr)
-
-if conn.null?
-  puts "Ошибка подключения"
-  exit 1
-end
+conn = XCB.xcb_connect(nil, nil)
 
 # Создание окна
 window_id = XCB.xcb_generate_id(conn)
-cookie = XCB.xcb_create_window(
-  conn, 0, window_id, 1,    # соединение, глубина, id, родитель
-  100, 100, 400, 300,       # x, y, width, height
-  0, 1, 0, 0, nil          # border, class, visual, mask, values
-)
-
-# Показ окна
+XCB.xcb_create_window(conn, ...)
 XCB.xcb_map_window(conn, window_id)
 XCB.xcb_flush(conn)
-
-# Ожидание событий
-loop do
-  event = XCB.xcb_wait_for_event(conn)
-  break if event.null?
-  # Обработка события...
-end
-
-# Отключение
-XCB.xcb_disconnect(conn)
 ```
 
-## Основные функции
+## Структура проекта
 
-### Подключение
-- `xcb_connect(display, screen_ptr)` - подключение к X серверу
-- `xcb_disconnect(conn)` - отключение
-- `xcb_connection_has_error(conn)` - проверка ошибок
+```
+ruby-xcb/
+├── lib/                    # Основные библиотечные файлы
+│   ├── xcb.rb             # Главный файл библиотеки
+│   └── xcb_complete.rb    # Полные FFI биндинги
+├── examples/               # Примеры использования
+│   ├── fixed_window.rb    # Рабочий пример окна
+│   └── ...
+├── test/                   # Тесты
+├── docs/                   # Документация
+│   ├── README.md          # Подробная документация
+│   └── FFI_BINDINGS_GUIDE.md # Руководство по FFI
+└── README.md              # Этот файл
+```
 
-### Окна
-- `xcb_create_window(...)` - создание окна
-- `xcb_destroy_window(conn, window)` - уничтожение окна
-- `xcb_map_window(conn, window)` - показ окна
-- `xcb_unmap_window(conn, window)` - скрытие окна
+## Установка
 
-### События
-- `xcb_wait_for_event(conn)` - ожидание события
-- `xcb_poll_for_event(conn)` - проверка событий без ожидания
-
-### Рисование
-- `xcb_clear_area(...)` - очистка области
-- `xcb_copy_area(...)` - копирование области
-- `xcb_poly_point(...)` - рисование точек
-- `xcb_poly_line(...)` - рисование линий
-
-### Графический контекст
-- `xcb_create_gc(...)` - создание GC
-- `xcb_free_gc(conn, gc)` - освобождение GC
-- `xcb_change_gc(...)` - изменение GC
-
-### Свойства
-- `xcb_intern_atom(...)` - интернирование атома
-- `xcb_change_property(...)` - изменение свойства
-- `xcb_get_property(...)` - получение свойства
-
-### Ввод
-- `xcb_grab_pointer(...)` - захват указателя
-- `xcb_grab_keyboard(...)` - захват клавиатуры
-- `xcb_query_pointer(...)` - запрос позиции указателя
-
-### Расширения
-- `xcb_query_extension(...)` - запрос расширения
-- `xcb_list_extensions(...)` - список расширений
-
-## Структуры
-
-- `XCB::GenericEvent` - общая структура события
-- `XCB::GenericError` - структура ошибки
-- `XCB::VoidCookie` - cookie для запросов
-- `XCB::AuthInfo` - информация аутентификации
-
-## Константы
-
-- `XCB::X_PROTOCOL` - версия протокола (11)
-- `XCB::XCB_CONN_ERROR` - код ошибки соединения
-- `XCB::X_TCP_PORT` - TCP порт X сервера (6000)
-
-## Примеры
-
-### Базовый тест
 ```bash
-ruby test/simple_test.rb
+git clone https://github.com/your-username/ruby-xcb.git
+cd ruby-xcb
+bundle install
 ```
 
-### Создание окна
+## Использование
+
+### Базовый пример
+
+```ruby
+require_relative 'lib/xcb'
+
+# Подключение
+conn = XCB.xcb_connect(nil, nil)
+setup = XCB.xcb_get_setup(conn)
+iter = XCB.xcb_setup_roots_iterator(setup)
+screen = XCB::Screen.new(iter[:data])
+
+# Создание окна
+window_id = XCB.xcb_generate_id(conn)
+XCB.xcb_create_window(conn, XCB::XCB_COPY_FROM_PARENT, window_id, 
+                     screen[:root], 100, 100, 400, 300, 2,
+                     XCB::XCB_WINDOW_CLASS_INPUT_OUTPUT, screen[:root_visual],
+                     0, nil)
+XCB.xcb_map_window(conn, window_id)
+XCB.xcb_flush(conn)
+```
+
+## Документация
+
+- [Подробная документация](docs/README.md)
+- [Руководство по FFI биндингам](docs/FFI_BINDINGS_GUIDE.md)
+
+## Тестирование
+
 ```bash
-ruby test/window_test.rb
+# Запуск всех тестов
+ruby test/test_complete.rb
+
+# Запуск примера окна
+DISPLAY=:0 ruby examples/fixed_window.rb
 ```
-
-### Комплексный тест
-```bash
-ruby test/final_test.rb
-```
-
-### Пример использования
-```bash
-ruby examples/example.rb
-```
-
-## Требования
-
-- Ruby с поддержкой FFI
-- libxcb-dev (Ubuntu/Debian)
-- X11 development headers
 
 ## Статистика
 
-- **94 функции** привязаны к libxcb
-- **5 структур** FFI определены
-- **10 констант** XCB
-- **40 типов** указателей
-- **15+ функций** протестированы и работают
+- **94 функции** из `libxcb.so`
+- **6 структур** данных
+- **Полная поддержка** основных операций XCB
+- **Совместимость** с MRI Ruby
 
-### Протестированные функции:
-- ✅ Подключение к X серверу
-- ✅ Создание и управление окнами
-- ✅ Графические контексты
-- ✅ Пиксмапы
-- ✅ Рисование (очистка, копирование)
-- ✅ Свойства и атомы
-- ✅ События
-- ✅ Расширения
-- ✅ Утилиты
+## Лицензия
 
-Полная совместимость с MRI Ruby и минималистичный дизайн. 
+MIT License - см. файл [LICENSE](LICENSE).
+
+## Вклад в проект
+
+1. Форкните репозиторий
+2. Создайте ветку для новой функции
+3. Внесите изменения
+4. Добавьте тесты
+5. Создайте Pull Request
+
+## Проблемы
+
+Если у вас возникли проблемы с FFI биндингами, см. [Руководство по FFI](docs/FFI_BINDINGS_GUIDE.md). 

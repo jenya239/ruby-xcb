@@ -47,6 +47,33 @@ module XCB
            :data, :pointer             # Указатель на данные
   end
   
+  # Структура для screen
+  class Screen < FFI::Struct
+    layout :root, :uint32,             # Root window
+           :default_colormap, :uint32, # Default colormap
+           :white_pixel, :uint32,      # White pixel value
+           :black_pixel, :uint32,      # Black pixel value
+           :current_input_masks, :uint32, # Current input masks
+           :width_in_pixels, :uint16,  # Width in pixels
+           :height_in_pixels, :uint16, # Height in pixels
+           :width_in_millimeters, :uint16, # Width in millimeters
+           :height_in_millimeters, :uint16, # Height in millimeters
+           :min_installed_maps, :uint16, # Min installed maps
+           :max_installed_maps, :uint16, # Max installed maps
+           :root_visual, :uint32,      # Root visual
+           :backing_stores, :uint8,    # Backing stores
+           :save_unders, :uint8,       # Save unders
+           :root_depth, :uint8,        # Root depth
+           :allowed_depths_len, :uint8 # Allowed depths length
+  end
+  
+  # Структура для screen iterator
+  class ScreenIterator < FFI::Struct
+    layout :data, :pointer,            # Pointer to screen data
+           :rem, :int,                 # Remaining screens
+           :index, :int                # Current index
+  end
+  
   # Константы XCB
   X_PROTOCOL = 11                      # Версия протокола X
   X_PROTOCOL_REVISION = 0              # Ревизия протокола
@@ -58,6 +85,22 @@ module XCB
   XCB_CONN_CLOSED_PARSE_ERR = 5        # Ошибка парсинга
   XCB_CONN_CLOSED_INVALID_SCREEN = 6   # Неверный экран
   XCB_CONN_CLOSED_FDPASSING_FAILED = 7 # Ошибка передачи файлового дескриптора
+  
+  # Константы для создания окна
+  XCB_COPY_FROM_PARENT = 0             # Copy depth from parent
+  XCB_WINDOW_CLASS_INPUT_OUTPUT = 1    # InputOutput window class
+  XCB_WINDOW_CLASS_INPUT_ONLY = 2      # InputOnly window class
+  
+  # Константы для атрибутов окна
+  XCB_CW_BACK_PIXEL = 0x00000002      # Background pixel
+  XCB_CW_BORDER_PIXEL = 0x00000004    # Border pixel
+  XCB_CW_EVENT_MASK = 0x00000800      # Event mask
+  
+  # Константы событий
+  XCB_EVENT_MASK_EXPOSURE = 0x00008000 # Exposure events
+  XCB_EVENT_MASK_KEY_PRESS = 0x00000001 # Key press events
+  XCB_EVENT_MASK_BUTTON_PRESS = 0x00000004 # Button press events
+  XCB_EVENT_MASK_STRUCTURE_NOTIFY = 0x00002000 # Structure notify events
   
   # === ФУНКЦИИ ПОДКЛЮЧЕНИЯ ===
   
@@ -71,6 +114,8 @@ module XCB
   attach_function :xcb_get_file_descriptor, [:pointer], :int
   # Получение setup информации от сервера
   attach_function :xcb_get_setup, [:pointer], :pointer
+  # Получение итератора экранов
+  attach_function :xcb_setup_roots_iterator, [:pointer], ScreenIterator.by_value
   # Генерация уникального ID ресурса
   attach_function :xcb_generate_id, [:pointer], :uint32
   
