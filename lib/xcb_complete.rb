@@ -74,6 +74,14 @@ module XCB
            :index, :int                # Current index
   end
   
+  # Структура для прямоугольника
+  class Rectangle < FFI::Struct
+    layout :x, :int16,                 # X координата
+           :y, :int16,                 # Y координата
+           :width, :uint16,            # Ширина
+           :height, :uint16            # Высота
+  end
+  
   # Константы XCB
   X_PROTOCOL = 11                      # Версия протокола X
   X_PROTOCOL_REVISION = 0              # Ревизия протокола
@@ -101,6 +109,13 @@ module XCB
   XCB_EVENT_MASK_KEY_PRESS = 0x00000001 # Key press events
   XCB_EVENT_MASK_BUTTON_PRESS = 0x00000004 # Button press events
   XCB_EVENT_MASK_STRUCTURE_NOTIFY = 0x00002000 # Structure notify events
+  
+  # Константы типов событий
+  XCB_EXPOSE = 12                      # Expose event
+  XCB_KEY_PRESS = 2                    # Key press event
+  
+  # Константы для графического контекста
+  XCB_GC_FOREGROUND = 0x00000004      # Foreground pixel
   
   # === ФУНКЦИИ ПОДКЛЮЧЕНИЯ ===
   
