@@ -95,6 +95,11 @@ module XCB
       self
     end
     
+    def set_line_width(width)
+      change_gc(XCB::XCB_GC_LINE_WIDTH, width)
+      self
+    end
+    
     def cleanup
       XCB.xcb_free_gc(@connection.connection, @gc_id) rescue nil
     end

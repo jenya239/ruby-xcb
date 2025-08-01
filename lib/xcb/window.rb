@@ -201,6 +201,7 @@ module XCB
                 when :key_press then XCB::XCB_EVENT_MASK_KEY_PRESS
                 when :button_press then XCB::XCB_EVENT_MASK_BUTTON_PRESS
                 when :button_release then XCB::XCB_EVENT_MASK_BUTTON_RELEASE
+                when :motion_notify then XCB::XCB_EVENT_MASK_POINTER_MOTION
                 else 0
                 end
       end

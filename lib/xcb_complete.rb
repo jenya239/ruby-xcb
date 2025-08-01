@@ -116,6 +116,7 @@ module XCB
   XCB_EVENT_MASK_KEY_PRESS = 0x00000001 # Key press events
   XCB_EVENT_MASK_BUTTON_PRESS = 0x00000004 # Button press events
   XCB_EVENT_MASK_BUTTON_RELEASE = 0x00000008 # Button release events
+  XCB_EVENT_MASK_POINTER_MOTION = 0x00000040 # Pointer motion events
   XCB_EVENT_MASK_STRUCTURE_NOTIFY = 0x00002000 # Structure notify events
   
   # Константы типов событий
@@ -134,7 +135,8 @@ module XCB
   
   # Константы для графического контекста
   XCB_GC_FOREGROUND = 0x00000004      # Foreground pixel
-  XCB_GC_BACKGROUND = 0x00000008      # Background pixel  
+  XCB_GC_BACKGROUND = 0x00000008      # Background pixel
+  XCB_GC_LINE_WIDTH = 0x00000010      # Line width
   XCB_GC_FONT = 0x00004000            # Font
   
   # === ФУНКЦИИ ПОДКЛЮЧЕНИЯ ===
