@@ -82,6 +82,12 @@ module XCB
            :height, :uint16            # Высота
   end
   
+  # Структура для точки
+  class Point < FFI::Struct
+    layout :x, :int16,                 # X координата
+           :y, :int16                  # Y координата
+  end
+  
   # Константы XCB
   X_PROTOCOL = 11                      # Версия протокола X
   X_PROTOCOL_REVISION = 0              # Ревизия протокола
@@ -103,19 +109,33 @@ module XCB
   XCB_CW_BACK_PIXEL = 0x00000002      # Background pixel
   XCB_CW_BORDER_PIXEL = 0x00000004    # Border pixel
   XCB_CW_EVENT_MASK = 0x00000800      # Event mask
+  XCB_CW_CURSOR = 0x00004000          # Cursor
   
   # Константы событий
   XCB_EVENT_MASK_EXPOSURE = 0x00008000 # Exposure events
   XCB_EVENT_MASK_KEY_PRESS = 0x00000001 # Key press events
   XCB_EVENT_MASK_BUTTON_PRESS = 0x00000004 # Button press events
+  XCB_EVENT_MASK_BUTTON_RELEASE = 0x00000008 # Button release events
   XCB_EVENT_MASK_STRUCTURE_NOTIFY = 0x00002000 # Structure notify events
   
   # Константы типов событий
   XCB_EXPOSE = 12                      # Expose event
   XCB_KEY_PRESS = 2                    # Key press event
+  XCB_BUTTON_PRESS = 4                 # Button press event
+  
+  # Константы для линий
+  XCB_COORD_MODE_ORIGIN = 0            # Coordinate mode
+  
+  # Константы для захвата
+  XCB_GRAB_MODE_SYNC = 0               # Synchronous grab
+  XCB_GRAB_MODE_ASYNC = 1              # Asynchronous grab
+  XCB_NONE = 0                         # None value
+  XCB_CURRENT_TIME = 0                 # Current time
   
   # Константы для графического контекста
   XCB_GC_FOREGROUND = 0x00000004      # Foreground pixel
+  XCB_GC_BACKGROUND = 0x00000008      # Background pixel  
+  XCB_GC_FONT = 0x00004000            # Font
   
   # === ФУНКЦИИ ПОДКЛЮЧЕНИЯ ===
   
@@ -170,6 +190,8 @@ module XCB
   attach_function :xcb_unmap_window, [:pointer, :uint32], VoidCookie
   # Настройка окна
   attach_function :xcb_configure_window, [:pointer, :uint32, :uint16, :pointer], VoidCookie
+  # Изменение атрибутов окна
+  attach_function :xcb_change_window_attributes, [:pointer, :uint32, :uint32, :pointer], VoidCookie
   # Получение геометрии окна
   attach_function :xcb_get_geometry, [:pointer, :uint32], VoidCookie
   # Получение ответа геометрии
@@ -211,6 +233,8 @@ module XCB
   attach_function :xcb_poly_rectangle, [:pointer, :uint32, :uint32, :uint32, :pointer], VoidCookie
   # Заливка прямоугольников
   attach_function :xcb_poly_fill_rectangle, [:pointer, :uint32, :uint32, :uint32, :pointer], VoidCookie
+  # Вывод текста
+  attach_function :xcb_image_text_8, [:pointer, :uint8, :uint32, :uint32, :int16, :int16, :string], VoidCookie
   
   # === ФУНКЦИИ ПИКСМАПОВ ===
   
@@ -234,6 +258,8 @@ module XCB
   
   # Создание курсора
   attach_function :xcb_create_cursor, [:pointer, :uint32, :uint32, :uint32, :uint32, :uint16, :uint16, :uint16, :uint16, :uint16, :uint16], VoidCookie
+  # Создание курсора из глифа
+  attach_function :xcb_create_glyph_cursor, [:pointer, :uint32, :uint32, :uint32, :uint32, :uint32, :uint16, :uint16, :uint16, :uint16, :uint16, :uint16], VoidCookie
   # Освобождение курсора
   attach_function :xcb_free_cursor, [:pointer, :uint32], VoidCookie
   
